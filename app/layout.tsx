@@ -1,0 +1,120 @@
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
+import "./globals.css";
+import ClientLayout from "./components/ClientLayout";
+import Footer from "./components/Footer";
+
+const formaArabic = localFont({
+  src: "../public/FormaDJRArabicText-Medium-Testing.otf",
+  display: "swap",
+});
+
+import { getCompany } from "./lib/company";
+
+const SITE_URL = "https://masaralhatif.com";
+
+export const viewport: Viewport = {
+  themeColor: "#04454A",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = await getCompany();
+
+  const siteName = c.nameAr || "سهلناها - مسار الجوال";
+  const titleDefault = `${siteName} | أفضل متجر لبيع شرائح الاتصال في السعودية`;
+  const description = c.details || "سهلناها مسار الجوال - تسوق أفضل شرائح الاتصال وباقات الإنترنت من فيرجن وSTC وزين وموبايلي بأسعار مميزة. توصيل سريع لجميع مناطق المملكة العربية السعودية.";
+  const ogImage = `${SITE_URL}/og-image.jpg`;
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: titleDefault,
+      template: `%s | ${siteName} - متجر إلكتروني معتمد`,
+    },
+    description,
+    keywords: [
+      "سهلناها", "سهلناها مسار الجوال", "Sahelnahatelecom", "مسار الجوال",
+      "شرائح اتصال", "باقات إنترنت", "شريحة SIM", "شريحة بيانات",
+      "فيرجن موبايل", "Virgin Mobile", "STC", "زين", "موبايلي",
+      "إنترنت مفتوح", "باقة شهرية", "باقة سنوية", "5G", "4G",
+      "شريحة إنترنت", "باقة بيانات", "سوشيال مفتوح",
+      "السعودية", "الرياض", "جدة", "مكة", "المدينة", "الدمام", "الخبر",
+      "أرخص باقات الإنترنت", "عروض شرائح الاتصال",
+    ],
+    authors: [{ name: siteName, url: SITE_URL }],
+    creator: siteName,
+    publisher: siteName,
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    openGraph: {
+      type: "website",
+      locale: "ar_SA",
+      url: SITE_URL,
+      siteName,
+      title: titleDefault,
+      description,
+      images: [
+        { url: ogImage, width: 1200, height: 630, alt: siteName, type: "image/jpeg" },
+        { url: `${SITE_URL}/android-chrome-512x512.png`, width: 512, height: 512, alt: siteName, type: "image/png" },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titleDefault,
+      description,
+      images: [ogImage],
+      creator: "@masaraljawal",
+      site: "@masaraljawal",
+    },
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+        { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    manifest: "/site.webmanifest",
+    alternates: {
+      canonical: SITE_URL,
+      languages: { "ar-SA": SITE_URL },
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || "",
+    },
+    category: "telecommunications",
+    other: {
+      "mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-capable": "yes",
+      "apple-mobile-web-app-status-bar-style": "black-translucent",
+    },
+  };
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="ar" dir="rtl">
+      <body className={`${formaArabic.className} antialiased`} suppressHydrationWarning>
+        <ClientLayout footer={<Footer />}>{children}</ClientLayout>
+      </body>
+    </html>
+  );
+}
