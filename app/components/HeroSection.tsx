@@ -5,20 +5,36 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+const DESKTOP_SLIDES = [
+  {
+    src: "/Saudi Man Relaxing Amid City Skyline.webp",
+    alt: "شرائح الاتصال في السعودية",
+    position: "center 20%",
+  },
+  {
+    src: "/Rooftop Connections at Sunset (1).webp",
+    alt: "شرائح الاتصال في السعودية",
+    position: "center 30%",
+  },
+];
+
+const SLIDE_INTERVAL = 5000; // ms
+
 export default function HeroSection() {
   const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80);
     return () => clearTimeout(t);
+  }, []);
+
+  // auto-advance slider
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % DESKTOP_SLIDES.length);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(id);
   }, []);
 
   const fadeUp = (delay: number) => ({
@@ -32,31 +48,41 @@ export default function HeroSection() {
   return (
     <section
       dir="rtl"
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden min-h-[420px] md:min-h-[600px]"
     >
-      {/* ─── الصورة — ديسكتوب ─── */}
-      <Image
-        src="/Saudi Man Relaxing Amid City Skyline.webp"
-        alt="شرائح الاتصال في السعودية"
-        fill
-        priority
-        quality={100}
-        className="object-cover md:block hidden"
-        style={{ objectPosition: "center 20%" }}
-        sizes="100vw"
-      />
+      {/* ─── سلايدر الصور — ديسكتوب ─── */}
+      {DESKTOP_SLIDES.map((slide, i) => (
+        <div
+          key={slide.src}
+          className="absolute inset-0 hidden md:block transition-opacity duration-1000"
+          style={{ opacity: i === currentSlide ? 1 : 0 }}
+        >
+          <Image
+            src={slide.src}
+            alt={slide.alt}
+            fill
+            priority={i === 0}
+            quality={100}
+            className="object-cover"
+            style={{ objectPosition: slide.position }}
+            sizes="100vw"
+          />
+        </div>
+      ))}
 
       {/* ─── الصورة — موبايل ─── */}
-      <Image
-        src="/Golden Hour Riyadh Terrace Call.png"
-        alt="شرائح الاتصال في السعودية"
-        fill
-        priority
-        quality={100}
-        className="object-cover md:hidden block"
-        style={{ objectPosition: "center 15%" }}
-        sizes="100vw"
-      />
+      <div className="absolute inset-0 block md:hidden">
+        <Image
+          src="/Golden Hour Riyadh Terrace Call.png"
+          alt="شرائح الاتصال في السعودية"
+          fill
+          priority
+          quality={100}
+          className="object-cover"
+          style={{ objectPosition: "center 15%" }}
+          sizes="100vw"
+        />
+      </div>
 
       {/* ─── المحتوى ─── */}
       <div className="relative z-10 flex flex-col justify-start max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-36 pb-16 md:pt-48 md:pb-40">
@@ -119,30 +145,30 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* ─── سهم للأسفل — ديسكتوب فقط ─── */}
+      {/* ─── دوتس السلايدر — ديسكتوب فقط ─── */}
       <div
+        className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 items-center gap-2 z-10"
         style={{
           opacity: visible ? 1 : 0,
           transition: "opacity 0.75s ease 560ms",
         }}
-        className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 z-10"
       >
-        <span className="text-white/60 text-xs font-medium tracking-widest drop-shadow">اكتشف أكثر</span>
-        <div className="w-5 h-8 rounded-full border border-white/40 flex items-start justify-center pt-1.5">
-          <div
-            className="w-1 h-2 bg-white/70 rounded-full"
-            style={{ animation: "scrollDot 1.6s ease-in-out infinite" }}
+        {DESKTOP_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentSlide(i)}
+            aria-label={`الشريحة ${i + 1}`}
+            className="transition-all duration-300 rounded-full"
+            style={{
+              width: i === currentSlide ? "24px" : "8px",
+              height: "8px",
+              background: i === currentSlide ? "#fff" : "rgba(255,255,255,0.45)",
+            }}
           />
-        </div>
+        ))}
       </div>
 
-      <style jsx>{`
-        @keyframes scrollDot {
-          0%   { transform: translateY(0);    opacity: 1; }
-          80%  { transform: translateY(10px); opacity: 0; }
-          100% { transform: translateY(0);    opacity: 0; }
-        }
-      `}</style>
+
     </section>
   );
 }

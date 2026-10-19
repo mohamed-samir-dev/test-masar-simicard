@@ -145,3 +145,16 @@ input, textarea, select {
 .animate-scroll-logos:hover {
   animation-play-state: paused;
 }
+
+/* Telecom partners marquee */
+@keyframes marquee-partners {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+.animate-marquee-rtl {
+  animation: marquee-partners 22s linear infinite;
+  will-change: transform;
+}
+.animate-marquee-rtl:hover {
+  animation-play-state: paused;
+}
